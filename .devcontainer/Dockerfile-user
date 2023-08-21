@@ -1,0 +1,56 @@
+# ARG BASE_IMAGE
+ARG BASE_IMAGE
+
+# FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE}
+
+# ARGS
+ARG USER_NAME
+ARG USER_UID
+ARG USER_GID
+ARG CONDA_ENV_NAME
+ARG DISPLAY
+
+
+ENV USER_NAME=${USER_NAME}
+ENV USER_GID=${USER_GID}
+ENV USER_UID=${USER_UID}
+ENV CONDA_ENV_NAME=${CONDA_ENV_NAME}
+ENV CONDA_ENV_PATH=/opt/conda/envs/${CONDA_ENV_NAME}/bin/
+ENV DISPLAY=${DISPLAY}
+
+
+RUN apt-get update \ 
+ && apt-get install -y sudo x11-apps xauth
+
+# USER CREATION
+RUN mkdir -p /etc/sudoers.d
+RUN groupadd --gid $USER_GID $USER_NAME \ 
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME
+RUN echo $USER_NAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USER_NAME \ 
+   && chmod 0440 /etc/sudoers.d/$USER_NAME
+RUN usermod -a -G root ${USER_NAME}
+
+# Log as $USER
+USER ${USER_UID}:${USER_GID}
+
+# Intialize conda and activate conda environment
+RUN conda init
+RUN echo "conda activate $CONDA_ENV_NAME" >> ~/.bashrc
+
+# ----Extra instructions----
+RUN sudo mkdir -p /python_packages
+
+
+RUN sudo chown -R $USER:$USER /python_packages
+
+
+RUN echo 'export PYTHONPATH=$PYTHONPATH:/python_packages/' >> ~/.bashrc
+
+
+RUN echo 'export PATH=$PATH:/opt/julia/bin' >> ~/.bashrc
+
+# Closing file
+SHELL ["/bin/bash", "--login", "-c"]
+ENTRYPOINT ["/bin/bash"]
+

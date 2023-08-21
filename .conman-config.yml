@@ -1,0 +1,78 @@
+# This is the default configuration file for conman.
+
+root_image:
+    generate: true
+    name: "one-for-all"
+    tag: "0.0"
+    from_image:
+        name: "ubuntu"
+        tag: "20.04"
+    conda:
+        enabled: true
+        directory: "/opt/conda"
+        env_name: "rapids"
+        environment_file: "./environment.yml"
+    extra_instructions: 
+        - "RUN cd /tmp && git clone https://github.com/Syllo/nvtop.git && mkdir -p nvtop/build && cd nvtop/build && cmake .. -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=OFF -DINTEL_SUPPORT=OFF && make install"
+        - "RUN apt-get update && apt install -y texlive-full"
+        - "RUN apt-get install software-properties-common && add-apt-repository ppa:inkscape.dev/stable && apt-get install inkscape"
+        - "RUN apt-get update && apt-get install xvfb"
+        - "COPY ./Project.toml /tmp/Project.toml"
+        - "COPY ./Manifest.toml /tmp/Manifest.toml"
+        - "ENV JULIA_VERSION=1.9.0"
+        - "ENV JULIA_RELEASE=1.9"
+        - "RUN wget --quiet https://julialang-s3.julialang.org/bin/linux/x64/${JULIA_RELEASE}/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && tar zxvf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C opt && cd /opt && mv julia-${JULIA_VERSION} julia"
+        - "RUN /opt/julia/bin/julia --project='/tmp/Project.toml' -e 'using Pkg; Pkg.instantiate()'"
+        - "RUN echo 'export PYTHONPATH=$PYTHONPATH:/python_packages/' >> ~/.bashrc"
+
+user_image:
+    name: "user_img_name"
+    tag: "user_img_tag"
+    extra_instructions:
+        - "RUN sudo mkdir -p /python_packages"
+        - "RUN sudo chown -R $USER:$USER /python_packages"
+        - "RUN echo 'export PYTHONPATH=$PYTHONPATH:/python_packages/' >> ~/.bashrc"
+        - "RUN echo 'export PATH=$PATH:/opt/julia/bin' >> ~/.bashrc"
+
+volumes: 
+    - ../../julia-conteneur:/workspace
+    - ../../redaction_repos:/workspace
+    - ../../working_repos:/workspace
+    - ../../working_repos/cdmath:/python_packages/cdmath
+    - ../../working_repos/harvesting/harvesting:/python_packages/harvesting
+    - ../../working_repos/cdHarvest/src:/python_packages/cdHarvest
+    - ../../working_repos/harvest/harvest_lib:/python_packages/harvest_lib
+graphical:
+    enabled: true
+    protocol: "x11"
+
+gpu:
+    enabled: true
+    manufacturer: "nvidia"
+    count: 2
+
+container:
+    name: "custom_container"
+    main_service:
+        name: "main"
+        container_name: "your_container_name"
+    devcontainer:
+        enabled: true
+        name: "your_devcontainer_name"
+        extensions:
+        - "ms-python.python"
+        - "ms-python.vscode-pylance"
+        - "mechatroner.rainbow-csv"
+        - "ms-azuretools.vscode-docker"
+        - "ms-toolsai.jupyter"
+        - "ms-toolsai.jupyter-keymap"
+        - "ms-toolsai.jupyter-renderers"
+        - "mhutchie.git-graph"
+        - "donjayamanne.githistory"
+        - "eamodio.gitlens"
+        - "mathematic.vscode-latex"
+        - "valentjn.vscode-ltex"
+        - "james-yu.latex-workshop"
+        - "torn4dom4n.latex-support"
+        - "tecosaur.latex-utilities"
+        - "cliffordfajardo.highlight-line-vscode"

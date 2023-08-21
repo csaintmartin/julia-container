@@ -1,0 +1,36 @@
+name: one4all_container
+services:
+  main:
+    build:
+      args:
+      - BASE_IMAGE=one-for-all:0.0
+      - CONDA_DIRECTORY=/opt/conda
+      - CONDA_ENV_NAME=rapids
+      - DISPLAY=localhost:10.0
+      - USER_GID=1004
+      - USER_NAME=csaintmartin
+      - USER_UID=1004
+      context: .
+      dockerfile: ./Dockerfile-user
+    container_name: bidule
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - capabilities:
+            - gpu
+            count: 2
+            driver: nvidia
+    network_mode: host
+    privileged: true
+    volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    - /home/csaintmartin/.Xauthority:/home/csaintmartin/.Xauthority:rw
+    - ../../julia-conteneur:/workspace/julia-conteneur
+    - ../../redaction_repos:/workspace/redaction_repos
+    - ../../working_repos:/workspace/working_repos
+    - ../../working_repos/cdmath/cdmath:/python_packages/cdmath
+    - ../../working_repos/harvesting/harvesting:/python_packages/harvesting
+    - ../../working_repos/cdHarvest/src:/python_packages/cdHarvest
+    - ../../working_repos/harvest/harvest_lib:/python_packages/harvest_lib
+version: '3.9'
