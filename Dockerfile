@@ -8,7 +8,25 @@ ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/Paris"
 RUN apt-get update
 
 # Development Tools and Libraries
-RUN apt-get install -y build-essential cmake libncurses5-dev libncursesw5-dev libv4l-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libxtst-dev libxss-dev libdbus-1-dev libevent-dev libfontconfig1-dev libcap-dev libpulse-dev libudev-dev libpci-dev libnss3-dev libasound2-dev libegl1-mesa-dev libdrm-dev
+RUN apt-get install -y build-essential libncurses5-dev libncursesw5-dev libv4l-dev libxcursor-dev libxcomposite-dev libxdamage-dev libxrandr-dev libxtst-dev libxss-dev libdbus-1-dev libevent-dev libfontconfig1-dev libcap-dev libpulse-dev libudev-dev libpci-dev libnss3-dev libasound2-dev libegl1-mesa-dev libdrm-dev
+
+#Cmake
+RUN apt-get update \
+	&& apt-get -y install build-essential \
+	&& apt-get install -y wget \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& wget https://github.com/Kitware/CMake/releases/download/v3.24.1/cmake-3.24.1-Linux-x86_64.sh \
+	-q -O /tmp/cmake-install.sh \
+	&& chmod u+x /tmp/cmake-install.sh \
+	&& mkdir /opt/cmake-3.24.1 \
+	&& /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.24.1 \
+	&& rm /tmp/cmake-install.sh \
+	&& ln -s /opt/cmake-3.24.1/bin/* /usr/local/bin
+
+
+
+# MANIM INSTALL
+RUN apt-get update && apt install -y python3-dev libcairo2-dev libpango1.0-dev
 
 # Multimedia libraries
 RUN apt-get install -y ffmpeg
@@ -18,6 +36,8 @@ RUN apt-get update && apt-get install -y x11-apps xauth
 
 # Other libraries
 RUN apt-get install -y git wget sudo gperf bison nodejs htop
+
+RUN apt-get install -y git-lfs
 
 # Locales update
 RUN apt install locales
@@ -68,6 +88,9 @@ RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 RUN echo "conda activate $CONDA_ENV_NAME" >> ~/.bashrc
 
 # ----Extra instructions----
+# PYTORCH INSTALL
+RUN $CONDA_ENV_BIN_PATH/pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+
 RUN cd /tmp && git clone https://github.com/Syllo/nvtop.git && mkdir -p nvtop/build && cd nvtop/build && cmake .. -DNVIDIA_SUPPORT=ON -DAMDGPU_SUPPORT=OFF -DINTEL_SUPPORT=OFF && make install
 
 

@@ -3,7 +3,7 @@ services:
   main:
     build:
       args:
-      - BASE_IMAGE=one-for-all:0.0
+      - BASE_IMAGE=one-for-all:0.3
       - CONDA_DIRECTORY=/opt/conda
       - CONDA_ENV_NAME=rapids
       - DISPLAY=localhost:10.0

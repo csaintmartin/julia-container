@@ -36,7 +36,7 @@
 				"python.testing.pytestEnabled": true,
 				"editor.wordWrap": "wordWrapColumn",
 				"editor.wordWrapColumn": 100,
-				"editor.ruler": 100,
+				"editor.ruler": 100
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
@@ -55,7 +55,7 @@
 				"james-yu.latex-workshop",
 				"torn4dom4n.latex-support",
 				"tecosaur.latex-utilities",
-				"cliffordfajardo.highlight-line-vscode"
+				"cliffordfajardo.highlight-line-vscode",
 			]
 		}
 	}

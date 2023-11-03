@@ -31,6 +31,7 @@ RUN echo $USER_NAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USER_NAME \
    && chmod 0440 /etc/sudoers.d/$USER_NAME
 RUN usermod -a -G root ${USER_NAME}
 
+
 # Log as $USER
 USER ${USER_UID}:${USER_GID}
 
